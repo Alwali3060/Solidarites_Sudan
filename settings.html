@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Solidarites_Sudan · Supply Chain & Operations</title>
+  <meta name="description" content="Humanitarian supply-chain management demo for Sudan with movement planning and timesheets." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="app.js"></script>
+</head>
+<body data-page="settings" data-protected="1">
+
+<header class="site-header">
+  <a class="brand" href="index.html">
+    <img src="assets/logo.png" alt="Solidarites_Sudan logo" />
+    <span>Solidarites_Sudan</span>
+  </a>
+  <nav>
+    <a data-protected href="dashboard.html">Dashboard</a>
+    <a data-protected href="items.html">Items</a>
+    <a data-protected href="warehouses.html">Warehouses</a>
+    <a data-protected href="suppliers.html">Suppliers</a>
+    <a data-protected href="purchase-orders.html">POs</a>
+    <a data-protected href="shipments.html">Shipments</a>
+    <a data-protected href="beneficiaries.html">Beneficiaries</a>
+    <a data-protected href="movements.html">Movements</a>
+    <a data-protected href="timesheets.html">Timesheets</a>
+    <a data-protected href="settings.html">Settings</a>
+    <a class="btn btn-pill" href="login.html" data-login-link>Log in</a>
+  </nav>
+</header>
+
+<main class="content narrow">
+  <h1>Settings</h1>
+  <p class="muted">Admin can configure external links used across the site.</p>
+  <div class="card form" data-form-links>
+    <label>External Dashboard URL <input name="dashboard" placeholder="https://..." /></label>
+    <label>Reports URL <input name="report" placeholder="https://..." /></label>
+    <div class="actions">
+      <button class="btn btn-primary" data-save-links>Save</button>
+    </div>
+  </div>
+  <h2>Demo Users</h2>
+  <div class="card">
+    <p class="tiny muted">These are <em>demo</em> accounts; on a real system use a backend & RBAC.</p>
+    <ul>
+      <li>staff@org — role: <code>staff</code></li>
+      <li>hr@org — role: <code>hr</code></li>
+      <li>cd@org — role: <code>cd</code></li>
+      <li>log@org — role: <code>logistics</code></li>
+      <li>admin@org — role: <code>admin</code></li>
+      <li>Password for all: <code>demo1234</code></li>
+    </ul>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="cols">
+    <div>
+      <strong>Solidarites_Sudan</strong>
+      <p class="muted">Nonprofit supply chain for faster, fairer aid across Sudan.</p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="items.html">Items</a></li>
+        <li><a href="movements.html">Movements</a></li>
+        <li><a href="timesheets.html">Timesheets</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>External</h4>
+      <ul>
+        <li><a target="_blank" rel="noopener" data-external="report">Reports</a></li>
+        <li><a target="_blank" rel="noopener" data-external="dashboard">External Dashboard</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <p>Email: <a href="mailto:info@solidarites-sudan.org">info@solidarites-sudan.org</a></p>
+      <p>HQ: Port Sudan • Hubs: El Fasher, Geneina, Nyala</p>
+    </div>
+  </div>
+  <p class="tiny muted">© 2025 Solidarites_Sudan. Demo only — no affiliation with any third party.</p>
+</footer>
+
+</body></html>
