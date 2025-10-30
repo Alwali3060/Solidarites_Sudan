@@ -1,0 +1,113 @@
+"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile · Solidarites_Sudan</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="app.js"></script>
+  <style>
+    .profile-wrap{max-width:780px;margin:24px auto;padding:0 20px}
+    .profile-card{display:grid;grid-template-columns:180px 1fr;gap:18px}
+    .avatar{width:144px;height:144px;border-radius:999px;border:2px solid #e5e7eb;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:48px;color:#111}
+    .avatar img{width:100%;height:100%;object-fit:cover;border-radius:999px}
+    .tiny-muted{color:#6b7280;font-size:.85rem}
+    .user-chip{display:inline-flex;align-items:center;gap:8px;border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px;background:#fff;cursor:pointer}
+    .user-chip .ic{width:26px;height:26px;border-radius:999px;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+    .user-menu{position:relative;display:inline-block}
+    .user-panel{position:absolute;right:0;top:42px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 10px 18px rgba(0,0,0,.08);min-width:180px;display:none}
+    .user-panel a, .user-panel button{display:block;width:100%;text-align:left;padding:10px 12px;background:#fff;border:0;color:#111;text-decoration:none}
+    .user-panel a:hover, .user-panel button:hover{background:#f3f4f6}
+  </style>
+</head>
+<body data-protected="1" data-page="profile">
+<header class="site-header">
+  <a class="brand" href="index.html">
+    <img src="assets/logo.png" alt="Solidarites_Sudan logo" />
+    <span>Solidarites_Sudan</span>
+  </a>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="movements.html">Movements</a>
+    <a href="timesheets.html">Timesheets</a>
+    <a class="btn btn-pill" href="login.html" data-login-link>Log in</a>
+  </nav>
+</header>
+
+<main class="profile-wrap">
+  <h1>Profile</h1>
+  <p class="tiny-muted">Manage your personal info (stored locally for this demo).</p>
+
+  <div class="card profile-card">
+    <div>
+      <div class="avatar" id="avatarBox"><span id="avatarInitials">U</span></div>
+      <label class="btn" style="margin-top:10px;display:inline-block">Upload avatar
+        <input type="file" accept="image/*" id="avatarInput" style="display:none" />
+      </label>
+    </div>
+    <form class="form" id="profileForm">
+      <label>Display name <input name="name" placeholder="Your name" /></label>
+      <label>Phone <input name="phone" placeholder="+249..." /></label>
+      <label>Location <input name="location" placeholder="Port Sudan / El Fasher / Khartoum" /></label>
+      <label>Email (read-only) <input name="email" readonly /></label>
+      <label>Role (read-only) <input name="role" readonly /></label>
+      <div class="actions">
+        <button class="btn btn-primary" type="submit">Save changes</button>
+        <button class="btn" type="button" id="logoutBtn">Log out</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p class="tiny muted">Demo only. In production, profiles are stored securely on the server and protected by RBAC/SSO.</p>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const me = (window.Auth && Auth.me && Auth.me()) || null;
+    if(!me){ return; }
+    // Init form with saved profile (or defaults)
+    const key = 'ssudan_profile_' + me.email;
+    const saved = JSON.parse(localStorage.getItem(key) || '{}');
+    const form = document.getElementById('profileForm');
+    form.name.value = saved.name || me.email.split('@')[0];
+    form.phone.value = saved.phone || '';
+    form.location.value = saved.location || '';
+    form.email.value = me.email;
+    form.role.value = me.role;
+
+    // Avatar
+    const avatarBox = document.getElementById('avatarBox');
+    const avatarInitials = (form.name.value.trim() || 'U').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    document.getElementById('avatarInitials').textContent = avatarInitials;
+    if(saved.avatar){ const img = new Image(); img.src = saved.avatar; avatarBox.innerHTML=''; avatarBox.appendChild(img); }
+
+    document.getElementById('avatarInput').addEventListener('change', (e)=>{
+      const f = e.target.files[0]; if(!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const data = reader.result; // dataURL
+        localStorage.setItem(key, JSON.stringify({...saved, name: form.name.value, phone: form.phone.value, location: form.location.value, avatar: data}));
+        const img = new Image(); img.src = data; avatarBox.innerHTML=''; avatarBox.appendChild(img);
+        if (window.updateHeaderUserChip) updateHeaderUserChip(); // refresh header
+      };
+      reader.readAsDataURL(f);
+    });
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const fresh = { name: form.name.value, phone: form.phone.value, location: form.location.value, avatar: saved.avatar || null };
+      localStorage.setItem(key, JSON.stringify(fresh));
+      if (window.updateHeaderUserChip) updateHeaderUserChip(); // refresh header chip
+      alert('Profile saved');
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      if (window.Auth) { Auth.logout(); location.href = 'login.html'; }
+    });
+  });
+</script>
+</body>
+</html>
+"""
