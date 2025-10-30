@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>E‑Sign · Solidarites_Sudan</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="app.js"></script>
+  <style>
+    .chips .chip{border:1px solid #e5e7eb;border-radius:999px;padding:4px 8px;margin:2px}
+    .hide{display:none}
+    .tiny-muted{color:#6b7280;font-size:.85rem}
+  </style>
+</head>
+<body data-protected="1" data-page="esign">
+<header class="site-header">
+  <a class="brand" href="index.html"><img src="assets/logo.png" alt="logo"/><span>Solidarites_Sudan</span></a>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="esign.html">E‑Sign</a>
+    <a class="btn btn-pill" href="login.html" data-login-link>Log in</a>
+  </nav>
+</header>
+
+<main class="content">
+  <div class="page-head">
+    <h1>E‑Sign Documents</h1>
+    <div class="page-actions">
+      <button class="btn btn-primary" data-add>New document</button>
+    </div>
+  </div>
+
+  <div class="card table">
+    <table>
+      <thead><tr><th>Title</th><th>Owner</th><th>Created</th><th>Status</th><th>Signers</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="dialog hide" data-dialog>
+    <div class="panel">
+      <h3>Document</h3>
+      <form class="form" id="docForm">
+        <label>Title <input name="title" required /></label>
+        <label>Content (plain text in demo) <textarea name="content" rows="6" placeholder="Paste contract text or instructions here"></textarea></label>
+        <div class="grid-2">
+          <label>Add signer (email) <input name="signer" placeholder="person@example.org" /></label>
+          <button class="btn" type="button" id="addSigner">Add signer</button>
+        </div>
+        <div id="signerList" class="chips" style="margin-bottom:10px"></div>
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Save</button>
+          <button class="btn" type="button" data-close>Close</button>
+        </div>
+        <p class="tiny-muted">After saving, use “Copy Links” to share personal signing links. A **mailto** is prepared for convenience; in production, emails are sent via your server.</p>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"><p class="tiny muted">Demo E‑Sign: signatures and documents are not legally binding; for real use, integrate with a backend and trusted e-sign provider.</p></footer>
+</body>
+</html>

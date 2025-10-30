@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Document · Solidarites_Sudan</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="app.js"></script>
+  <style>
+    .sign-wrap{max-width:800px;margin:24px auto;padding:0 20px}
+    canvas{border:1px dashed #e5e7eb;border-radius:10px}
+  </style>
+</head>
+<body data-page="sign">
+<header class="site-header">
+  <a class="brand" href="index.html"><img src="assets/logo.png" alt="logo"/><span>Solidarites_Sudan</span></a>
+  <nav>
+    <a href="login.html">Log in</a>
+  </nav>
+</header>
+
+<main class="sign-wrap">
+  <h1>Sign Document</h1>
+  <p id="signStatus" class="muted"></p>
+  <div class="card">
+    <h3>Document</h3>
+    <div id="docHolder" class="muted" style="white-space:pre-wrap"></div>
+  </div>
+
+  <div class="card">
+    <h3>Your signature</h3>
+    <p class="tiny muted">Draw inside the box below, then click Sign.</p>
+    <canvas id="pad" width="720" height="220"></canvas>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn" id="btnClear" type="button">Clear</button>
+      <button class="btn btn-primary" id="btnSign" type="button">Sign</button>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"><p class="tiny muted">This is a demo signing page for external users; the link you received is unique to you.</p></footer>
+</body>
+</html>

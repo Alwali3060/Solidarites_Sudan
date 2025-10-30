@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Users · Solidarites_Sudan</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="app.js"></script>
+  <style>
+    .dialog{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+    .dialog .panel{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;min-width:320px;max-width:560px}
+    .hide{display:none}
+    .chips{display:flex;flex-wrap:wrap;gap:6px}
+    .chips .chip{border:1px solid #e5e7eb;border-radius:999px;padding:4px 8px}
+  </style>
+</head>
+<body data-protected="1" data-page="users">
+<header class="site-header">
+  <a class="brand" href="index.html"><img src="assets/logo.png" alt="logo"/><span>Solidarites_Sudan</span></a>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="users.html">Users</a>
+    <a href="esign.html">E‑Sign</a>
+    <a class="btn btn-pill" href="login.html" data-login-link>Log in</a>
+  </nav>
+</header>
+
+<main class="content">
+  <div class="page-head">
+    <h1>Users & Access</h1>
+    <div class="page-actions">
+      <button class="btn btn-primary" data-add>New user</button>
+    </div>
+  </div>
+
+  <div class="card table">
+    <table>
+      <thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Status</th><th>Access</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="dialog hide" data-dialog>
+    <div class="panel">
+      <h3 id="dlgTitle">User</h3>
+      <form class="form" id="userForm">
+        <label>Email <input name="email" type="email" required /></label>
+        <label>Display name <input name="name" /></label>
+        <label>Role
+          <select name="role">
+            <option>staff</option>
+            <option>hr</option>
+            <option>cd</option>
+            <option>logistics</option>
+            <option>viewer</option>
+            <option>admin</option>
+          </select>
+        </label>
+        <label>Temporary password <input name="pass" placeholder="Leave blank to keep existing" /></label>
+        <label class="caps">Page access (granular)</label>
+        <div class="chips">
+          <label class="chip"><input type="checkbox" data-access="items" /> Items</label>
+          <label class="chip"><input type="checkbox" data-access="warehouses" /> Warehouses</label>
+          <label class="chip"><input type="checkbox" data-access="suppliers" /> Suppliers</label>
+          <label class="chip"><input type="checkbox" data-access="pos" /> POs</label>
+          <label class="chip"><input type="checkbox" data-access="shipments" /> Shipments</label>
+          <label class="chip"><input type="checkbox" data-access="beneficiaries" /> Beneficiaries</label>
+          <label class="chip"><input type="checkbox" data-access="movements" /> Movements</label>
+          <label class="chip"><input type="checkbox" data-access="timesheets" /> Timesheets</label>
+          <label class="chip"><input type="checkbox" data-access="settings" /> Settings</label>
+        </div>
+        <label><input type="checkbox" name="active" checked /> Active</label>
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Save</button>
+          <button class="btn" type="button" data-close>Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"><p class="tiny muted">Admins can also control page-level access (granular). Admins are always allowed everywhere.</p></footer>
+</body>
+</html>
