@@ -1,24 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+# Build a fresh Solidarites_Sudan pro site with requested changes:
+# - SI color scheme + provided logo
+# - Role-based auth (demo) and protected pages
+# - External links configuration
+# - Movement Planning: only HR, CD, Admin can delete; bulk validation actions
+# - Timesheets module
+# - Supply chain modules
+#
+# Then zip and provide for download.
 
+import os, zipfile, datetime, shutil
+
+root = "/mnt/data/Solidarites_Sudan-pro-site_v2"
+assets = os.path.join(root, "assets")
+os.makedirs(assets, exist_ok=True)
+
+# Copy provided logo
+src_logo = "/mnt/data/logotype-si-color-left-CMJN-crop.png"
+dst_logo = os.path.join(assets, "logo.png")
+if os.path.exists(src_logo):
+    shutil.copy(src_logo, dst_logo)
+
+brand = "Solidarites_Sudan"
+site_desc = "Humanitarian supply-chain management demo for Sudan with movement planning and timesheets."
+
+base_head = f"""
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Solidarites_Sudan · Supply Chain & Operations</title>
-  <meta name="description" content="Humanitarian supply-chain management demo for Sudan with movement planning and timesheets." />
+  <title>{brand} · Supply Chain & Operations</title>
+  <meta name="description" content="{site_desc}" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <script defer src="app.js"></script>
+"""
 
-</head>
-<body>
-
+nav = f"""
 <header class="site-header">
   <a class="brand" href="index.html">
-    <img src="assets/logo.png" alt="Solidarites_Sudan logo" />
-    <span>Solidarites_Sudan</span>
+    <img src="assets/logo.png" alt="{brand} logo" />
+    <span>{brand}</span>
   </a>
   <nav>
     <a data-protected href="dashboard.html">Dashboard</a>
@@ -34,9 +55,42 @@
     <a class="btn btn-pill" href="login.html" data-login-link>Log in</a>
   </nav>
 </header>
+"""
 
-<main>
-  
+footer = f"""
+<footer class="site-footer">
+  <div class="cols">
+    <div>
+      <strong>{brand}</strong>
+      <p class="muted">Nonprofit supply chain for faster, fairer aid across Sudan.</p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="items.html">Items</a></li>
+        <li><a href="movements.html">Movements</a></li>
+        <li><a href="timesheets.html">Timesheets</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>External</h4>
+      <ul>
+        <li><a target="_blank" rel="noopener" data-external="report">Reports</a></li>
+        <li><a target="_blank" rel="noopener" data-external="dashboard">External Dashboard</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <p>Email: <a href="mailto:info@solidarites-sudan.org">info@solidarites-sudan.org</a></p>
+      <p>HQ: Port Sudan • Hubs: El Fasher, Geneina, Nyala</p>
+    </div>
+  </div>
+  <p class="tiny muted">© {datetime.date.today().year} {brand}. Demo only — no affiliation with any third party.</p>
+</footer>
+"""
+
+hero = f"""
 <section class="hero">
   <div class="hero-inner">
     <h1>Humanitarian Supply Chain for <span class="accent">Sudan</span></h1>
@@ -61,7 +115,14 @@
     </div>
   </div>
 </section>
+"""
 
+index_html = f"""<!DOCTYPE html>
+<html lang="en"><head>{base_head}</head>
+<body>
+{nav}
+<main>
+  {hero}
   <section class="features">
     <div class="grid-3">
       <div class="card">
@@ -89,37 +150,689 @@
     </div>
   </section>
 </main>
+{footer}
+</body></html>
+"""
 
-<footer class="site-footer">
-  <div class="cols">
-    <div>
-      <strong>Solidarites_Sudan</strong>
-      <p class="muted">Nonprofit supply chain for faster, fairer aid across Sudan.</p>
-    </div>
-    <div>
-      <h4>Explore</h4>
-      <ul>
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="items.html">Items</a></li>
-        <li><a href="movements.html">Movements</a></li>
-        <li><a href="timesheets.html">Timesheets</a></li>
-      </ul>
-    </div>
-    <div>
-      <h4>External</h4>
-      <ul>
-        <li><a target="_blank" rel="noopener" data-external="report">Reports</a></li>
-        <li><a target="_blank" rel="noopener" data-external="dashboard">External Dashboard</a></li>
-      </ul>
-    </div>
-    <div>
-      <h4>Contact</h4>
-      <p>Email: <a href="mailto:info@solidarites-sudan.org">info@solidarites-sudan.org</a></p>
-      <p>HQ: Port Sudan • Hubs: El Fasher, Geneina, Nyala</p>
+def table_page(title, headers_html, form_html, page_id):
+    return f"""<!DOCTYPE html>
+<html lang="en"><head>{base_head}</head>
+<body data-page="{page_id}" data-protected="1">
+{nav}
+<main class="content">
+  <div class="page-head">
+    <h1>{title}</h1>
+    <div class="page-actions">
+      <button class="btn" data-export>Export CSV</button>
+      <label class="btn file">Import CSV<input type="file" accept=".csv" data-import /></label>
+      <button class="btn btn-primary" data-add>New</button>
     </div>
   </div>
-  <p class="tiny muted">© 2025 Solidarites_Sudan. Demo only — no affiliation with any third party.</p>
-</footer>
+  <div class="card form hide" data-form>
+    {form_html}
+    <div class="actions">
+      <button class="btn btn-primary" data-save>Save</button>
+      <button class="btn" data-cancel>Cancel</button>
+    </div>
+  </div>
+  <div class="card table">
+    <table data-table>
+      <thead>{headers_html}</thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
+{footer}
+</body></html>
+"""
 
-</body>
-</html>
+items_head = "<tr><th>SKU</th><th>Name</th><th>Unit</th><th>Category</th><th>Min Stock</th><th></th></tr>"
+items_form = """
+<label>SKU <input name="sku" required /></label>
+<label>Name <input name="name" required /></label>
+<label>Unit <input name="unit" placeholder="pcs, kg, box" required /></label>
+<label>Category <input name="category" placeholder="WASH, Food, Shelter" required /></label>
+<label>Min Stock <input name="min" type="number" min="0" value="0" required /></label>
+"""
+
+warehouses_head = "<tr><th>Code</th><th>Name</th><th>Location</th><th>Capacity</th><th></th></tr>"
+warehouses_form = """
+<label>Code <input name="code" required /></label>
+<label>Name <input name="name" required /></label>
+<label>Location <input name="location" placeholder="El Fasher" required /></label>
+<label>Capacity (m³) <input name="capacity" type="number" min="0" value="0" required /></label>
+"""
+
+suppliers_head = "<tr><th>Vendor ID</th><th>Name</th><th>Contact</th><th>Email</th><th></th></tr>"
+suppliers_form = """
+<label>Vendor ID <input name="id" required /></label>
+<label>Name <input name="name" required /></label>
+<label>Contact <input name="contact" /></label>
+<label>Email <input type="email" name="email" /></label>
+"""
+
+pos_head = "<tr><th>PO #</th><th>Supplier</th><th>Date</th><th>Item (SKU)</th><th>Qty</th><th>Unit</th><th>Status</th><th></th></tr>"
+pos_form = """
+<label>PO # <input name="po" required /></label>
+<label>Supplier <input name="supplier" required /></label>
+<label>Date <input type="date" name="date" required /></label>
+<label>Item (SKU) <input name="sku" required /></label>
+<label>Qty <input type="number" name="qty" min="0" required /></label>
+<label>Unit <input name="unit" required /></label>
+<label>Status
+  <select name="status">
+    <option>Draft</option>
+    <option>Approved</option>
+    <option>Partially Received</option>
+    <option>Closed</option>
+  </select>
+</label>
+"""
+
+shipments_head = "<tr><th>Shipment #</th><th>PO #</th><th>From</th><th>To</th><th>ETA</th><th>Status</th><th></th></tr>"
+shipments_form = """
+<label>Shipment # <input name="ship" required /></label>
+<label>PO # <input name="po" required /></label>
+<label>From (WH) <input name="from" required /></label>
+<label>To (WH) <input name="to" required /></label>
+<label>ETA <input type="date" name="eta" required /></label>
+<label>Status
+  <select name="status">
+    <option>Planned</option>
+    <option>In transit</option>
+    <option>Delivered</option>
+  </select>
+</label>
+"""
+
+beneficiaries_head = "<tr><th>ID</th><th>Name</th><th>Location</th><th>HH Size</th><th>Last Received</th><th></th></tr>"
+beneficiaries_form = """
+<label>ID <input name="id" required /></label>
+<label>Name <input name="name" required /></label>
+<label>Location <input name="location" required /></label>
+<label>HH Size <input type="number" name="hh" min="1" value="1" required /></label>
+<label>Last Received <input type="date" name="last" /></label>
+"""
+
+# Movements page with checkbox + bulk actions
+movements_html = f"""<!DOCTYPE html>
+<html lang="en"><head>{base_head}</head>
+<body data-page="movements" data-protected="1">
+{nav}
+<main class="content">
+  <div class="page-head">
+    <h1>Movement Planning</h1>
+    <div class="page-actions">
+      <button class="btn" data-export>Export CSV</button>
+      <label class="btn file">Import CSV<input type="file" accept=".csv" data-import /></label>
+      <button class="btn btn-primary" data-add>New request</button>
+    </div>
+  </div>
+
+  <div class="card form hide" data-form>
+    <div class="grid-2">
+      <label>Req ID <input name="id" required /></label>
+      <label>Staff <input name="staff" required /></label>
+    </div>
+    <div class="grid-2">
+      <label>From <input name="origin" required /></label>
+      <label>To <input name="dest" required /></label>
+    </div>
+    <div class="grid-2">
+      <label>Start <input type="date" name="start" required /></label>
+      <label>End <input type="date" name="end" required /></label>
+    </div>
+    <label>Purpose <input name="purpose" required /></label>
+    <label>Status
+      <select name="status">
+        <option>Draft</option>
+        <option>Submitted</option>
+        <option>HR_Approved</option>
+        <option>CD_Approved</option>
+        <option>Planned</option>
+        <option>Completed</option>
+      </select>
+    </label>
+    <div class="actions">
+      <button class="btn btn-primary" data-save>Save</button>
+      <button class="btn" data-cancel>Cancel</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="page-actions" id="bulkActions" style="margin-bottom:10px">
+      <div class="muted tiny">Bulk actions on selected:</div>
+      <button class="btn" data-bulk="hr">HR Approve</button>
+      <button class="btn" data-bulk="cd">CD Validate</button>
+      <button class="btn" data-bulk="plan">Plan</button>
+      <button class="btn" data-bulk="complete">Mark Completed</button>
+    </div>
+    <div class="table">
+      <table data-table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" data-select-all /></th>
+            <th>ID</th><th>Staff</th><th>From</th><th>To</th><th>Dates</th><th>Purpose</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="muted tiny">Workflow: Staff submits → HR review → CD validation → Logistics planning → Completed.</p>
+</main>
+{footer}
+</body></html>
+"""
+
+login_html = f"""<!DOCTYPE html>
+<html lang="en"><head>{base_head}</head>
+<body>
+{nav}
+<main class="content narrow">
+  <h1>Login</h1>
+  <p class="muted">Demo-only authentication (localStorage). For production, add a backend service.</p>
+  <form class="card form" data-type="login">
+    <label>Email <input type="email" name="email" required placeholder="user@org" /></label>
+    <label>Password <input type="password" name="password" required placeholder="••••••••" /></label>
+    <div class="actions">
+      <button class="btn btn-primary" type="submit">Log in</button>
+      <span class="form-msg tiny" aria-live="polite"></span>
+    </div>
+  </form>
+</main>
+{footer}
+</body></html>
+"""
+
+dashboard_html = f"""<!DOCTYPE html>
+<html lang="en"><head>{base_head}</head>
+<body data-page="dashboard" data-protected="1">
+{nav}
+<main class="content">
+  <h1>Dashboard</h1>
+  <div class="grid-3">
+    <div class="card metric"><span class="label">Stock on Hand</span><strong id="m_soh">0</strong></div>
+    <div class="card metric"><span class="label">Open POs</span><strong id="m_pos">0</strong></div>
+    <div class="card metric"><span class="label">Shipments in Transit</span><strong id="m_ship">0</strong></div>
+  </div>
+  <div class="card table">
+    <h3>Upcoming Shipments</h3>
+    <table>
+      <thead><tr><th>Shipment #</th><th>Route</th><th>ETA</th><th>Status</th></tr></thead>
+      <tbody id="tbl_upcoming"></tbody>
+    </table>
+  </div>
+</main>
+{footer}
+</body></html>
+"""
+
+about_html = f"""<!DOCTYPE html>
+<html lang="en"><head>{base_head}</head>
+<body>
+{nav}
+<main class="content">
+  <h1>About</h1>
+  <p class="lede">{site_desc}</p>
+</main>
+{footer}
+</body></html>
+"""
+
+contact_html = f"""<!DOCTYPE html>
+<html lang="en"><head>{base_head}</head>
+<body>
+{nav}
+<main class="content">
+  <h1>Contact</h1>
+  <form class="card form" data-type="contact">
+    <div class="grid-2">
+      <label>Organization <input name="org" required /></label>
+      <label>Contact name <input name="name" required /></label>
+    </div>
+    <div class="grid-2">
+      <label>Email <input type="email" name="email" required /></label>
+      <label>Region <input name="region" placeholder="Darfur, Khartoum, Kassala" /></label>
+    </div>
+    <label>Message <textarea name="message" rows="5" required></textarea></label>
+    <div class="actions">
+      <button class="btn btn-primary" type="submit">Send</button>
+      <span class="form-msg" aria-live="polite"></span>
+    </div>
+  </form>
+</main>
+{footer}
+</body></html>
+"""
+
+privacy_html = f"""<!DOCTYPE html>
+<html lang="en"><head>{base_head}</head>
+<body>
+{nav}
+<main class="content">
+  <h1>Privacy Policy</h1>
+  <p class="muted">Example policy text. Replace with your legal policy.</p>
+</main>
+{footer}
+</body></html>
+"""
+
+terms_html = f"""<!DOCTYPE html>
+<html lang="en"><head>{base_head}</head>
+<body>
+{nav}
+<main class="content">
+  <h1>Terms of Use</h1>
+  <p class="muted">Example terms. Replace with your organization's terms.</p>
+</main>
+{footer}
+</body></html>
+"""
+
+styles_css = """
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#e5e7eb; --text:#111827; --muted:#6b7280;
+  --accent:#e11d14; --accent-2:#000000; --ok:#16a34a; --warn:#f59e0b; --err:#dc2626;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+a{color:var(--accent-2);text-decoration:none}
+a:hover{opacity:.9}
+.muted{color:var(--muted)}
+.caps{text-transform:uppercase;letter-spacing:.08em;font-size:.8rem}
+.tiny{font-size:.85rem}
+.site-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:2px solid var(--accent)}
+.site-header .brand{display:flex;gap:10px;align-items:center;font-weight:700}
+.site-header .brand img{height:34px}
+.site-header nav{display:flex;gap:14px;align-items:center}
+.btn{background:#f8fafc;border:1px solid var(--line);padding:10px 14px;border-radius:10px}
+.btn-primary{background:var(--accent);color:#fff;border:0}
+.btn-pill{border-radius:999px}
+.hero{padding:40px 20px;background:linear-gradient(90deg,rgba(225,29,20,.08),rgba(0,0,0,.04))}
+.hero-inner{max-width:1100px;margin:0 auto;text-align:left}
+.hero h1{font-size:clamp(2rem,3.2vw,3rem);margin:0 0 8px}
+.accent{color:var(--accent)}
+.lede{color:var(--muted);max-width:760px;margin:0 0 16px}
+.cta{display:flex;gap:12px;margin:12px 0 24px}
+.hero-card{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:900px;margin:0}
+.kpi{background:#fff;border:1px solid var(--line);padding:16px;border-radius:10px}
+.kpi strong{font-size:1.8rem;color:var(--accent-2)}
+.features,.content{max-width:1100px;margin:24px auto;padding:0 20px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);padding:16px;border-radius:12px}
+.page-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0}
+.page-actions{display:flex;gap:10px;flex-wrap:wrap}
+.file input[type="file"]{display:none}
+.form label{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.form input,.form select,.form textarea{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;color:var(--text)}
+.form .actions{display:flex;gap:12px;align-items:center;margin-top:10px}
+.form.hide{display:none}
+.table table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+.table td:last-child{width:180px}
+.table .row-actions{display:flex;gap:8px;flex-wrap:wrap}
+.badge{padding:2px 8px;border-radius:999px;border:1px solid var(--line);font-size:.8rem}
+.metric{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.metric .label{color:var(--muted)}
+.site-footer{border-top:1px solid var(--line);padding:24px 20px;background:#fafafa}
+.site-footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr 2fr;gap:16px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;border:1px solid #111827;padding:10px 14px;border-radius:10px}
+.toast.ok{background:#14532d}
+.toast.err{background:#7f1d1d}
+@media (max-width: 920px){ .site-footer .cols{grid-template-columns:1fr 1fr} }
+@media (max-width: 640px){ .hero-card{grid-template-columns:1fr} .site-footer .cols{grid-template-columns:1fr} }
+"""
+
+app_js = r"""
+// ====== Auth (demo-only) ======
+const HASH = (s) => { let h = 0; for (let i=0;i<s.length;i++){ h=(h<<5)-h+s.charCodeAt(i); h|=0;} return String(h); };
+const DEMO_USERS = {
+  "staff@org": {role:"staff", pass: HASH("demo1234")},
+  "hr@org": {role:"hr", pass: HASH("demo1234")},
+  "cd@org": {role:"cd", pass: HASH("demo1234")},
+  "log@org": {role:"logistics", pass: HASH("demo1234")},
+  "admin@org": {role:"admin", pass: HASH("demo1234")},
+};
+const Auth = {
+  key: "ssudan_auth",
+  login(email, pass){ const u = DEMO_USERS[email]; if(!u || u.pass!==HASH(pass)) return null; const s={email,role:u.role,at:Date.now()}; localStorage.setItem(Auth.key, JSON.stringify(s)); return s; },
+  me(){ try { return JSON.parse(localStorage.getItem(Auth.key)||"null"); } catch(e){ return null; } },
+  logout(){ localStorage.removeItem(Auth.key); },
+  require(){ if(document.body.getAttribute('data-protected')){ if(!Auth.me()) window.location.href='login.html'; } }
+};
+
+// ====== DB & CSV ======
+const DB = {
+  key: (name) => `ssudan_${name}`,
+  get: (name) => JSON.parse(localStorage.getItem(DB.key(name)) || "[]"),
+  set: (name, data) => localStorage.setItem(DB.key(name), JSON.stringify(data)),
+  add: (name, row) => { const d = DB.get(name); d.push(row); DB.set(name, d); },
+  del: (name, idx) => { const d = DB.get(name); d.splice(idx,1); DB.set(name, d); },
+};
+const CSV = {
+  to: (rows, headers) => {
+    const esc = (v) => `"${String(v ?? "").replace(/"/g,'""')}"`;
+    const head = headers.map(esc).join(",");
+    const body = rows.map(r => headers.map(h => esc(r[h])).join(",")).join("\n");
+    return head + "\n" + body;
+  },
+  from: async (file) => {
+    const text = await file.text();
+    const [head, ...lines] = text.split(/\r?\n/).filter(Boolean);
+    const headers = head.split(",").map(h=>h.replace(/^"|"$/g,""));
+    const rows = lines.map(line => {
+      const cols = line.match(/("([^"]|"")*"|[^,]+)/g).map(c=>c.replace(/^"|"$/g,"").replace(/""/g,'"'));
+      const obj = {}; headers.forEach((h,i)=>obj[h] = cols[i]); return obj;
+    });
+    return { headers, rows };
+  }
+};
+function toast(msg, ok=true){ const n=document.createElement('div'); n.className='toast '+(ok?'ok':'err'); n.textContent=msg; document.body.appendChild(n); setTimeout(()=>n.remove(),2400); }
+function bindExternalLinks(){ const cfg=JSON.parse(localStorage.getItem('ssudan_links')||'{}'); document.querySelectorAll('[data-external="dashboard"]').forEach(a=>a.href=cfg.dashboard||'#'); document.querySelectorAll('[data-external="report"]').forEach(a=>a.href=cfg.report||'#'); }
+
+// ====== KPIs ======
+function initKPIs(){
+  const d={ shipments:DB.get('shipments'), pos:DB.get('pos'), items:DB.get('items'), movements:DB.get('movements') };
+  const inTransit=d.shipments.filter(s=>s.status==='In transit').length;
+  const openPOs=d.pos.filter(p=>['Draft','Approved','Partially Received'].includes(p.status)).length;
+  const soh=d.items.length*100;
+  const pendingMov=d.movements.filter(m=>['Submitted','HR_Approved','CD_Approved'].includes(m.status)).length;
+  const el=(id)=>document.getElementById(id);
+  if(el('m_soh')) el('m_soh').textContent=soh.toLocaleString();
+  if(el('m_pos')) el('m_pos').textContent=openPOs;
+  if(el('m_ship')) el('m_ship').textContent=inTransit;
+  if(el('kpiDeliveries')) el('kpiDeliveries').textContent=(d.shipments.length*100).toLocaleString();
+  if(el('kpiOpen')) el('kpiOpen').textContent=openPOs;
+  if(el('kpiMov')) el('kpiMov').textContent=pendingMov;
+  const tbl=document.getElementById('tbl_upcoming');
+  if(tbl){ tbl.innerHTML=''; DB.get('shipments').slice(0,5).forEach(s=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${s.ship}</td><td>${s.from} → ${s.to}</td><td>${s.eta}</td><td>${s.status}</td>`; tbl.appendChild(tr); }); }
+}
+
+// ====== Generic CRUD ======
+function pageTableCrud(entity, headers){
+  const body=document.querySelector('tbody');
+  const formWrap=document.querySelector('[data-form]');
+  const btnAdd=document.querySelector('[data-add]');
+  const btnSave=document.querySelector('[data-save]');
+  const btnCancel=document.querySelector('[data-cancel]');
+  const inputFile=document.querySelector('[data-import]');
+  const btnExport=document.querySelector('[data-export]');
+  const inputs=formWrap?formWrap.querySelectorAll('input,select,textarea'):[];
+  function render(){
+    const data=DB.get(entity); body.innerHTML='';
+    data.forEach((row, idx)=>{
+      const tr=document.createElement('tr');
+      const cells=headers.map(h=>`<td>${row[h]??''}</td>`).join('');
+      tr.innerHTML=cells+`<td><div class="row-actions"><button class="btn" data-del="${idx}">Delete</button></div></td>`;
+      body.appendChild(tr);
+    });
+  }
+  btnAdd?.addEventListener('click', ()=>{ formWrap.classList.remove('hide'); inputs.forEach(i=>i.value=''); });
+  btnCancel?.addEventListener('click', ()=> formWrap.classList.add('hide'));
+  btnSave?.addEventListener('click', ()=>{ const row={}; inputs.forEach(i=>row[i.name]=i.value); DB.add(entity,row); render(); formWrap.classList.add('hide'); toast('Saved'); });
+  body?.addEventListener('click',(e)=>{ const del=e.target.getAttribute('data-del'); if(del!==null){ DB.del(entity, Number(del)); render(); toast('Deleted'); } });
+  btnExport?.addEventListener('click', ()=>{ const csv=CSV.to(DB.get(entity), headers); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=`${entity}.csv`; a.click(); });
+  inputFile?.addEventListener('change', async (e)=>{ const f=e.target.files[0]; if(!f) return; const {rows}=await CSV.from(f); const mapped=rows.map(r=>{const o={}; headers.forEach(h=>o[h]=r[h]??''); return o;}); DB.set(entity,mapped); render(); toast('Imported CSV'); });
+  render();
+}
+
+// ====== Movements (with restricted delete + bulk actions) ======
+function pageMovements(){
+  const me=Auth.me()||{role:'guest'};
+  const canDelete=['hr','cd','admin'].includes(me.role);
+  const body=document.querySelector('tbody');
+  const formWrap=document.querySelector('[data-form]');
+  const btnAdd=document.querySelector('[data-add]');
+  const btnSave=document.querySelector('[data-save]');
+  const btnCancel=document.querySelector('[data-cancel]');
+  const inputFile=document.querySelector('[data-import]');
+  const btnExport=document.querySelector('[data-export]');
+  const inputs=formWrap.querySelectorAll('input,select,textarea');
+  const bulkBar=document.getElementById('bulkActions');
+
+  // Show only allowed bulk buttons per role
+  if (me.role==='hr'){ bulkBar.querySelectorAll('button').forEach(b=>b.style.display=(b.dataset.bulk==='hr'?'inline-block':'none')); }
+  else if (me.role==='cd'){ bulkBar.querySelectorAll('button').forEach(b=>b.style.display=(b.dataset.bulk==='cd'?'inline-block':'none')); }
+  else if (me.role==='logistics'){ bulkBar.querySelectorAll('button').forEach(b=>b.style.display=(['plan','complete'].includes(b.dataset.bulk)?'inline-block':'none')); }
+  else if (me.role==='admin'){ /* show all */ }
+  else { bulkBar.style.display='none'; }
+
+  function render(){
+    const data=DB.get('movements');
+    body.innerHTML='';
+    data.forEach((row, idx)=>{
+      const dates=`${row.start||''} → ${row.end||''}`;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td><input type="checkbox" data-sel="${idx}" /></td>
+        <td>${row.id||''}</td>
+        <td>${row.staff||''}</td>
+        <td>${row.origin||''}</td>
+        <td>${row.dest||''}</td>
+        <td>${dates}</td>
+        <td>${row.purpose||''}</td>
+        <td><span class="badge">${row.status||''}</span></td>
+        <td>
+          <div class="row-actions">
+            ${canDelete?`<button class="btn" data-del="${idx}">Delete</button>`:''}
+            ${me.role==='hr'&&row.status==='Submitted'?`<button class="btn" data-act="hr" data-idx="${idx}">HR Approve</button>`:''}
+            ${me.role==='cd'&&row.status==='HR_Approved'?`<button class="btn" data-act="cd" data-idx="${idx}">CD Validate</button>`:''}
+            ${me.role==='logistics'&&row.status==='CD_Approved'?`<button class="btn" data-act="plan" data-idx="${idx}">Plan</button>`:''}
+            ${me.role==='logistics'&&row.status==='Planned'?`<button class="btn" data-act="complete" data-idx="${idx}">Mark Completed</button>`:''}
+          </div>
+        </td>`;
+      body.appendChild(tr);
+    });
+  }
+
+  btnAdd?.addEventListener('click', ()=>{ formWrap.classList.remove('hide'); inputs.forEach(i=>i.value=''); });
+  btnCancel?.addEventListener('click', ()=> formWrap.classList.add('hide'));
+  btnSave?.addEventListener('click', ()=>{ const row={}; inputs.forEach(i=>row[i.name]=i.value); DB.add('movements', row); render(); formWrap.classList.add('hide'); toast('Saved'); });
+
+  body.addEventListener('click',(e)=>{
+    const del=e.target.getAttribute('data-del');
+    const act=e.target.getAttribute('data-act');
+    const idx=Number(e.target.getAttribute('data-idx'));
+    if(del!==null){
+      if(!canDelete){ toast('You do not have permission to delete', false); return; }
+      DB.del('movements', Number(del)); render(); toast('Deleted'); return;
+    }
+    if(act){
+      const d=DB.get('movements'); const row=d[idx];
+      if(act==='hr' && me.role==='hr') row.status='HR_Approved';
+      if(act==='cd' && me.role==='cd') row.status='CD_Approved';
+      if(act==='plan' && me.role==='logistics') row.status='Planned';
+      if(act==='complete' && me.role==='logistics') row.status='Completed';
+      DB.set('movements', d); render(); toast('Updated');
+    }
+  });
+
+  // Select-all + bulk actions
+  const selectAll=document.querySelector('[data-select-all]');
+  selectAll?.addEventListener('change', (e)=>{ body.querySelectorAll('input[type="checkbox"][data-sel]').forEach(cb=>cb.checked=e.target.checked); });
+  bulkBar?.addEventListener('click', (e)=>{
+    const kind=e.target.getAttribute('data-bulk'); if(!kind) return;
+    const allowed=(me.role==='admin')||(me.role==='hr'&&kind==='hr')||(me.role==='cd'&&kind==='cd')||(me.role==='logistics'&&(kind==='plan'||kind==='complete'));
+    if(!allowed){ toast('Not allowed', false); return; }
+    const d=DB.get('movements');
+    body.querySelectorAll('input[type="checkbox"][data-sel]:checked').forEach(cb=>{
+      const i=Number(cb.getAttribute('data-sel'));
+      if(kind==='hr' && d[i].status==='Submitted') d[i].status='HR_Approved';
+      if(kind==='cd' && d[i].status==='HR_Approved') d[i].status='CD_Approved';
+      if(kind==='plan' && d[i].status==='CD_Approved') d[i].status='Planned';
+      if(kind==='complete' && d[i].status==='Planned') d[i].status='Completed';
+    });
+    DB.set('movements', d); render(); toast('Bulk updated');
+  });
+
+  // Export / Import
+  btnExport?.addEventListener('click', ()=>{ const csv=CSV.to(DB.get('movements'), ['id','staff','origin','dest','start','end','purpose','status']); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='movements.csv'; a.click(); });
+  inputFile?.addEventListener('change', async (e)=>{ const f=e.target.files[0]; if(!f) return; const {rows}=await CSV.from(f); DB.set('movements', rows); render(); toast('Imported CSV'); });
+
+  render();
+}
+
+// ====== Timesheets ======
+function pageTimesheets(){ pageTableCrud('timesheets', ['year','month','staff','cost','days','hours','notes']); }
+
+// ====== Settings ======
+function initSettings(){
+  const form=document.querySelector('[data-form-links]'); if(!form) return;
+  const inputs=form.querySelectorAll('input');
+  const saved=JSON.parse(localStorage.getItem('ssudan_links')||'{}');
+  inputs.forEach(i=>i.value=saved[i.name]||'');
+  form.querySelector('[data-save-links]')?.addEventListener('click', ()=>{
+    const cfg={}; inputs.forEach(i=>cfg[i.name]=i.value.trim());
+    localStorage.setItem('ssudan_links', JSON.stringify(cfg)); bindExternalLinks(); toast('Saved links');
+  });
+}
+
+// ====== Boot ======
+document.addEventListener('DOMContentLoaded', ()=>{
+  Auth.require(); bindExternalLinks(); initKPIs();
+  // Login
+  document.querySelectorAll('form[data-type="login"]').forEach(f=>{
+    const msg=f.querySelector('.form-msg');
+    f.addEventListener('submit', e=>{ e.preventDefault(); const email=f.querySelector('input[name="email"]').value.trim(); const pw=f.querySelector('input[name="password"]').value; const s=Auth.login(email,pw); if(s){ window.location.href='dashboard.html'; } else { msg.textContent='Invalid credentials (e.g., admin@org / demo1234)'; } });
+  });
+  // Contact
+  document.querySelectorAll('form[data-type="contact"]').forEach(f=>{ const msg=f.querySelector('.form-msg'); f.addEventListener('submit', e=>{ e.preventDefault(); msg.textContent='Message sent!'; toast('Message sent!'); f.reset(); }); });
+  // Init pages
+  const page=document.body.getAttribute('data-page');
+  if(page==='items') pageTableCrud('items',['sku','name','unit','category','min']);
+  if(page==='warehouses') pageTableCrud('warehouses',['code','name','location','capacity']);
+  if(page==='suppliers') pageTableCrud('suppliers',['id','name','contact','email']);
+  if(page==='purchase-orders') pageTableCrud('pos',['po','supplier','date','sku','qty','unit','status']);
+  if(page==='shipments') pageTableCrud('shipments',['ship','po','from','to','eta','status']);
+  if(page==='beneficiaries') pageTableCrud('beneficiaries',['id','name','location','hh','last']);
+  if(page==='movements') pageMovements();
+  if(page==='timesheets') pageTimesheets();
+  if(page==='settings') initSettings();
+});
+"""
+
+settings_html = f"""<!DOCTYPE html>
+<html lang="en"><head>{base_head}</head>
+<body data-page="settings" data-protected="1">
+{nav}
+<main class="content narrow">
+  <h1>Settings</h1>
+  <p class="muted">Admin can configure external links used across the site.</p>
+  <div class="card form" data-form-links>
+    <label>External Dashboard URL <input name="dashboard" placeholder="https://..." /></label>
+    <label>Reports URL <input name="report" placeholder="https://..." /></label>
+    <div class="actions">
+      <button class="btn btn-primary" data-save-links>Save</button>
+    </div>
+  </div>
+  <h2>Demo Users</h2>
+  <div class="card">
+    <p class="tiny muted">These are demo accounts; for production use a backend & RBAC.</p>
+    <ul>
+      <li>staff@org — role: <code>staff</code></li>
+      <li>hr@org — role: <code>hr</code></li>
+      <li>cd@org — role: <code>cd</code></li>
+      <li>log@org — role: <code>logistics</code></li>
+      <li>admin@org — role: <code>admin</code></li>
+      <li>Password for all: <code>demo1234</code></li>
+    </ul>
+  </div>
+</main>
+{footer}
+</body></html>
+"""
+
+readme_md = f"""
+# {brand} — Supply Chain & Operations (Static Demo, v2)
+
+Changes requested:
+- Delete permission on **Movements** is restricted to **HR, CD, Admin**.
+- Added **bulk validation** (HR Approve, CD Validate, Plan, Complete) with role gating.
+- SI-style colors + provided logo.
+- Demo auth (localStorage) with protected pages.
+- Supply-chain modules, Movement planning, Timesheets, External links config.
+
+## Demo accounts
+- staff@org / demo1234
+- hr@org / demo1234
+- cd@org / demo1234
+- log@org / demo1234
+- admin@org / demo1234
+
+## Deploy
+Upload to GitHub and enable Pages (root). For production, add a backend with RBAC, SSO, and audit logs.
+"""
+
+mit_license = f"""MIT License
+
+Copyright (c) {datetime.date.today().year}
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
+gitignore = ".DS_Store\nThumbs.db\n.vscode/\n.idea/\n*.log\n"
+
+files = {
+  "index.html": index_html,
+  "dashboard.html": dashboard_html,
+  "items.html": table_page("Items & Kits", f"<tr>{items_head}</tr>", items_form, "items"),
+  "warehouses.html": table_page("Warehouses", f"<tr>{warehouses_head}</tr>", warehouses_form, "warehouses"),
+  "suppliers.html": table_page("Suppliers", f"<tr>{suppliers_head}</tr>", suppliers_form, "suppliers"),
+  "purchase-orders.html": table_page("Purchase Orders", f"<tr>{pos_head}</tr>", pos_form, "purchase-orders"),
+  "shipments.html": table_page("Shipments", f"<tr>{shipments_head}</tr>", shipments_form, "shipments"),
+  "beneficiaries.html": table_page("Beneficiaries", f"<tr>{beneficiaries_head}</tr>", beneficiaries_form, "beneficiaries"),
+  "movements.html": movements_html,
+  "timesheets.html": table_page("Timesheets", "<tr><th>Year</th><th>Month</th><th>Staff</th><th>Cost Center</th><th>Days</th><th>Total Hours</th><th>Notes</th><th></th></tr>", """
+    <div class='grid-2'>
+      <label>Year <input type='number' name='year' required /></label>
+      <label>Month <input type='number' name='month' min='1' max='12' required /></label>
+    </div>
+    <div class='grid-2'>
+      <label>Staff <input name='staff' required /></label>
+      <label>Cost Center <input name='cost' /></label>
+    </div>
+    <div class='grid-2'>
+      <label>Days worked <input type='number' name='days' min='0' max='31' required /></label>
+      <label>Total hours <input type='number' name='hours' min='0' required /></label>
+    </div>
+    <label>Notes <textarea name='notes'></textarea></label>
+  """, "timesheets"),
+  "settings.html": settings_html,
+  "login.html": login_html,
+  "about.html": about_html,
+  "contact.html": contact_html,
+  "privacy.html": privacy_html,
+  "terms.html": terms_html,
+  "styles.css": styles_css,
+  "app.js": app_js,
+  "README.md": readme_md,
+  "LICENSE": mit_license,
+  ".gitignore": gitignore
+}
+
+for path, content in files.items():
+    full = os.path.join(root, path)
+    os.makedirs(os.path.dirname(full), exist_ok=True)
+    with open(full, "w", encoding="utf-8") as f:
+        f.write(content)
+
+
